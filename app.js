@@ -4,20 +4,28 @@ const express = require("express");
 const multer = require("multer");
 const mongoose = require("mongoose");
 const app = express();
+const cors = require("cors");
 
 const {fileFilter, storage} = require("./services/img-upload/fileFilter");
 
 try {
-    console.log(process.env.CONNECTION_STRING);
     mongoose
         .connect(process.env.CONNECTION_STRING)
         .then(() => console.log("SERVER IS CONNECTED"))
         .catch((err) => console.log(err));
 
+    app.use(
+        cors({
+            origin: "http://localhost:3000"
+        })
+    );
     app.use(express.json());
     app.use(express.urlencoded({extended: true}));
     app.use(multer({storage, fileFilter}).single("img"));
 
+    app.get("/", (req, res) =>
+        res.status(200).json({message: "Welcome to Event Management API"})
+    );
     app.use("/api", require("./routes/routeUser"));
     app.use("/api", require("./routes/routeProfile"));
     app.use("/api", require("./routes/routeEvent"));
