@@ -5,6 +5,7 @@ const multer = require("multer");
 const mongoose = require("mongoose");
 const app = express();
 const cors = require("cors");
+const {errorHandler} = require("./middleware/errorMiddleware");
 
 const {fileFilter, storage} = require("./services/img-upload/fileFilter");
 
@@ -35,6 +36,8 @@ try {
     app.use("/api", require("./routes/routeNotifications"));
     app.use("/api", require("./routes/routeMonetization"));
     app.use("/api", require("./routes/routeUpload"));
+
+    app.use(errorHandler);
 
     app.listen(port, () => console.log(`SERVER IS RUNNING ON ${port}`));
 } catch (error) {
