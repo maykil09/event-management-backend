@@ -13,10 +13,10 @@ const createBooking = async (req, res) => {
 
 const getBookingsByCustomer = async (req, res) => {
     try {
-        const { accountId, status } = req.query;
-        return Booking.find({ "header.customer.accountId": accountId, status })
-            .sort({ "date.createdAt": "desc" }) // filter by date
-            .select({ __v: 0 }) // Do not return _id and __v
+        const {accountId, status} = req.query;
+        return Booking.find({"header.customer.accountId": accountId, status})
+            .sort({"date.createdAt": "desc"}) // filter by date
+            .select({__v: 0}) // Do not return _id and __v
             .then((value) => res.status(200).json(value))
             .catch((err) => res.status(400).json(err));
     } catch (error) {
@@ -26,10 +26,19 @@ const getBookingsByCustomer = async (req, res) => {
 
 const getBookingsByPlanner = async (req, res) => {
     try {
-        const { accountId, status } = req.query;
-        return Booking.find({ "header.planner.accountId": accountId, status })
-            .sort({ "date.createdAt": "desc" }) // filter by date
-            .select({ __v: 0 }) // Do not return _id and __v
+        const {accountId, status} = req.query;
+
+        const filter = {"header.planner.accountId": accountId};
+
+        if (status) {
+            filter["status"] = status;
+        }
+
+        console.log(filter);
+
+        return Booking.find(filter)
+            .sort({"date.createdAt": "desc"}) // filter by date
+            .select({__v: 0}) // Do not return _id and __v
             .then((value) => res.status(200).json(value))
             .catch((err) => res.status(400).json(err));
     } catch (error) {
@@ -39,46 +48,52 @@ const getBookingsByPlanner = async (req, res) => {
 
 const updateBookingStatus = async (req, res) => {
     try {
-        const { _id, status } = req.body;
-        Booking.findByIdAndUpdate(_id,
+        const {_id, status} = req.body;
+        Booking.findByIdAndUpdate(
+            _id,
             {
                 $set: {
                     status,
-                    "date.updatedAt": Date.now(),
-                },
+                    "date.updatedAt": Date.now()
+                }
             },
-            { new: true, runValidators: true }
+            {new: true, runValidators: true}
         )
             .then((value) => {
                 if (!value)
-                    return res.status(400).json({ message: "accountId not found" });
+                    return res
+                        .status(400)
+                        .json({message: "accountId not found"});
                 return res.status(200).json(value);
             })
             .catch((err) => res.status(400).json(err));
     } catch (e) {
-        return res.status(400).json({ message: "Something went wrong" });
+        return res.status(400).json({message: "Something went wrong"});
     }
 };
 const updateBookingPaymentStatus = async (req, res) => {
     try {
-        const { _id, status } = req.body;
-        Booking.findByIdAndUpdate(_id,
+        const {_id, status} = req.body;
+        Booking.findByIdAndUpdate(
+            _id,
             {
                 $set: {
                     "payment.status": status,
-                    "date.updatedAt": Date.now(),
-                },
+                    "date.updatedAt": Date.now()
+                }
             },
-            { new: true, runValidators: true }
+            {new: true, runValidators: true}
         )
             .then((value) => {
                 if (!value)
-                    return res.status(400).json({ message: "accountId not found" });
+                    return res
+                        .status(400)
+                        .json({message: "accountId not found"});
                 return res.status(200).json(value);
             })
             .catch((err) => res.status(400).json(err));
     } catch (e) {
-        return res.status(400).json({ message: "Something went wrong" });
+        return res.status(400).json({message: "Something went wrong"});
     }
 };
 module.exports = {
@@ -87,5 +102,4 @@ module.exports = {
     getBookingsByPlanner,
     updateBookingStatus,
     updateBookingPaymentStatus
-
 };

@@ -7,8 +7,8 @@ const userRoles = [
     "planner",
     "organizer",
     "super-admin",
-    "general-organizer",
-    "general-planner"
+    "super-organizer",
+    "super-planner"
 ];
 const eventTypes = [
     "wedding",

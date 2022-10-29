@@ -1,5 +1,6 @@
 const Event = require("../../models/event");
 const distanceBetween = require("../../helpers/distanceBetween");
+const asyncHandler = require("express-async-handler");
 
 const createEvent = async (req, res) => {
     try {
@@ -14,27 +15,33 @@ const createEvent = async (req, res) => {
 
 const getAllEvents = async (req, res) => {
     try {
-        const { latitude, longitude, sortBy } = req.query;
+        const {latitude, longitude, sortBy} = req.query;
 
+        console.log(req.query);
         if (latitude == undefined || longitude == undefined)
-            return res.status(400).json({ message: "exact coordinates is required" });
+            return res
+                .status(400)
+                .json({message: "exact coordinates is required"});
 
-        return Event.find({ "event.available": true })
-            .select({ __v: 0 }) // Do not return _id and __v
+        return Event.find({"event.available": true})
+            .select({__v: 0}) // Do not return _id and __v
             .then((value) => {
                 const result = value
                     .map((element, _) => {
-                        const start = element.header.address.coordinates.latitude;
-                        const end = element.header.address.coordinates.longitude;
+                        const start =
+                            element.header.address.coordinates.latitude;
+                        const end =
+                            element.header.address.coordinates.longitude;
                         const data = {
                             ...element._doc,
-                            distance: distanceBetween(
-                                start,
-                                end,
-                                latitude,
-                                longitude,
-                                "K"
-                            ).toFixed(0) + "km",
+                            distance:
+                                distanceBetween(
+                                    start,
+                                    end,
+                                    latitude,
+                                    longitude,
+                                    "K"
+                                ).toFixed(0) + "km"
                         };
                         return data;
                     })
@@ -55,46 +62,54 @@ const getAllEvents = async (req, res) => {
 
 const getEventsByPlanner = async (req, res) => {
     try {
-        const { accountId, category } = req.query;
-        if(category != undefined) {
-              return Event.find({ "header.accountId": accountId, "event.type": category })
-               .sort({ _id: -1 })
-                 .select({ __v: 0 }) // Do not return _id and __v
-                 .then((value) => res.status(200).json(value))
-                 .catch((err) => res.status(400).json(err));
+        const {accountId, category} = req.query;
+        if (category != undefined) {
+            return Event.find({
+                "header.accountId": accountId,
+                "event.type": category
+            })
+                .sort({_id: -1})
+                .select({__v: 0}) // Do not return _id and __v
+                .then((value) => res.status(200).json(value))
+                .catch((err) => res.status(400).json(err));
         }
-        return Event.find({ "header.accountId": accountId})
-            .sort({ _id: -1 })
-             .select({ __v: 0 }) // Do not return _id and __v
-             .then((value) => res.status(200).json(value))
-             .catch((err) => res.status(400).json(err));
+        return Event.find({"header.accountId": accountId})
+            .sort({_id: -1})
+            .select({__v: 0}) // Do not return _id and __v
+            .then((value) => res.status(200).json(value))
+            .catch((err) => res.status(400).json(err));
     } catch (error) {
         console.error(error);
     }
-}
+};
 const getEvents = async (req, res) => {
     try {
-        const { accountId, latitude, longitude, sortBy } = req.query;
+        const {accountId, latitude, longitude, sortBy} = req.query;
 
         if (latitude == undefined || longitude == undefined)
-            return res.status(400).json({ message: "exact coordinates is required" });
+            return res
+                .status(400)
+                .json({message: "exact coordinates is required"});
 
-        return Event.find({ "header.accountId": accountId })
-            .select({ __v: 0 }) // Do not return _id and __v
+        return Event.find({"header.accountId": accountId})
+            .select({__v: 0}) // Do not return _id and __v
             .then((value) => {
                 const result = value
                     .map((element, _) => {
-                        const start = element.header.address.coordinates.latitude;
-                        const end = element.header.address.coordinates.longitude;
+                        const start =
+                            element.header.address.coordinates.latitude;
+                        const end =
+                            element.header.address.coordinates.longitude;
                         const data = {
                             ...element._doc,
-                            distance: distanceBetween(
-                                start,
-                                end,
-                                latitude,
-                                longitude,
-                                "K"
-                            ).toFixed(0) + "km",
+                            distance:
+                                distanceBetween(
+                                    start,
+                                    end,
+                                    latitude,
+                                    longitude,
+                                    "K"
+                                ).toFixed(0) + "km"
                         };
                         return data;
                     })
@@ -111,28 +126,31 @@ const getEvents = async (req, res) => {
     } catch (error) {
         console.error(error);
     }
-}
+};
 
 const updateEvent = async (req, res) => {
     try {
-        const { _id, available } = req.body;
-        Event.findByIdAndUpdate(_id,
+        const {_id, available} = req.body;
+        Event.findByIdAndUpdate(
+            _id,
             {
                 $set: {
                     "event.available": available,
-                    "date.updatedAt": Date.now(),
-                },
+                    "date.updatedAt": Date.now()
+                }
             },
-            { new: true }
+            {new: true}
         )
             .then((value) => {
                 if (!value)
-                    return res.status(400).json({ message: "accountId not found" });
+                    return res
+                        .status(400)
+                        .json({message: "accountId not found"});
                 return res.status(200).json(value);
             })
             .catch((err) => res.status(400).json(err));
     } catch (e) {
-        return res.status(400).json({ message: "Something went wrong" });
+        return res.status(400).json({message: "Something went wrong"});
     }
 };
 
@@ -140,12 +158,20 @@ const deleteEvent = async (req, res) => {
     try {
         const _id = req.params.id;
         return Event.findByIdAndDelete(_id)
-            .then(() => res.status(200).json({ message: "success" }))
-            .catch(() => res.status(400).json({ message: "failed" }));
+            .then(() => res.status(200).json({message: "success"}))
+            .catch(() => res.status(400).json({message: "failed"}));
     } catch (error) {
         console.log(error);
     }
 };
+
+const getAllEventsByPlanner = asyncHandler(async (req, res) => {
+    const {id} = req.user;
+
+    const events = await Event.find({"header.accountId": id});
+
+    res.status(200).json(events);
+});
 
 module.exports = {
     createEvent,
@@ -153,6 +179,6 @@ module.exports = {
     getAllEvents,
     getEventsByPlanner,
     updateEvent,
-    deleteEvent
-
+    deleteEvent,
+    getAllEventsByPlanner
 };

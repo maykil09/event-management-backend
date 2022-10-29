@@ -15,11 +15,7 @@ try {
         .then(() => console.log("SERVER IS CONNECTED"))
         .catch((err) => console.log(err));
 
-    app.use(
-        cors({
-            origin: "http://localhost:3000"
-        })
-    );
+    app.use(cors());
     app.use(express.json());
     app.use(express.urlencoded({extended: true}));
     app.use(multer({storage, fileFilter}).single("img"));
@@ -36,6 +32,10 @@ try {
     app.use("/api", require("./routes/routeNotifications"));
     app.use("/api", require("./routes/routeMonetization"));
     app.use("/api", require("./routes/routeUpload"));
+    app.use("/api", require("./routes/routePlan"));
+    app.use("/api", require("./routes/routeSubscription"));
+    app.use("/api", require("./routes/routeSales"));
+    app.use("/api", require("./routes/routeLog"));
 
     app.use(errorHandler);
 

@@ -19,9 +19,11 @@ const protected = asyncHandler(async (req, res, next) => {
 
             //Get user from the token
             req.user = await User.findById(decoded.data).select("-hashValue");
-            const profile = await Profile.findOne({accountId: decoded.data});
+            // const profile = await Profile.findOne({accountId: decoded.data});
 
-            req.user = {...req.user, role: profile.role};
+            // console.log(req.user);
+
+            // // req.user = {...req.user, role: profile.role};
 
             next();
         } catch (error) {
