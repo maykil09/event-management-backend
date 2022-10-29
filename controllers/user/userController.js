@@ -302,14 +302,11 @@ const createCustomer = asyncHandler(async (req, res) => {
         role: role,
         disabled: false
     });
+    console.log(user);
 
     if (user) {
-        const log = await Log.create({
-            accountId: id,
-            message: "Create a user"
-        });
         res.status(201).json({
-            _id: user.id,
+            accountId: user._id,
             email: user.email,
             password: user.password,
             role: user.role,

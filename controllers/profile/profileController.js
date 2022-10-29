@@ -16,10 +16,6 @@ const createProfile = async (req, res) => {
         return new Profile(req.body)
             .save()
             .then(async (value) => {
-                const log = await Log.create({
-                    accountId: accountId,
-                    message: "Logged in"
-                });
                 res.status(200).json(value);
             })
             .catch((err) => res.status(400).json(err.errors));
@@ -78,9 +74,11 @@ const updateProfile = async (req, res) => {
             "date.updatedAt": Date.now()
         };
 
-        if (images.length !== 0) {
-            console.log(images);
-            toUpdate["gallery"] = images;
+        if (images) {
+            if (images.length !== 0) {
+                console.log(images);
+                toUpdate["gallery"] = images;
+            }
         }
 
         Profile.findOneAndUpdate(
